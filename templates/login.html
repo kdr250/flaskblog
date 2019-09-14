@@ -1,19 +1,21 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div>
-<form method="POST" action="">
-  {{ form.hidden_tag() }}
+  <form method="POST" action="">
+    <div>
+    {{ form.hidden_tag() }}
 
-  {{ form.email.label }}
-  {{ form.email }}
-</div>
-<div>
-  {{ form.password.label }}
-  {{ form.password }}
-</div>
-<div>
-  {{ form.submit }}
-</form>
+    {{ form.email.label }}
+    {{ form.email }}
+    </div>
+    <div>
+      {{ form.password.label }}
+      {{ form.password }}
+    </div>
+    <div>
+      {{ form.submit }} 
+    </div>
+  </form>
 </div>
 
 {% endblock %}

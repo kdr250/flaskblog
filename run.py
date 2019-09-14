@@ -1,10 +1,10 @@
 # Main
 from flask import Flask, render_template, redirect, url_for, flash
-from flask_login import LoginManager, current_user, login_user, logout_user
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from flask_bcrypt import Bcrypt
 
 # forms
-from forms import ResigtrationForm, LoginForm
+from forms import ResigtrationForm, LoginForm, PostForm
 
 # DB
 from flask_sqlalchemy import SQLAlchemy
@@ -26,20 +26,8 @@ from models import User, Post
 # routes
 @app.route('/')
 def home():
-  posts = [
-    {
-      'author': 'Taro',
-      'title': 'First Post',
-      'contet': 'The first post!',
-      'date_posted': '2019/09/11',
-    },
-    {
-      'author': 'Jiro',
-      'title': 'Secnd Post',
-      'contet': 'The second post!',
-      'date_posted': '2019/09/13',
-    }
-  ]
+  # posts = Post.query.order_by(Post.date_posted.desc())
+  posts = Post.query.all()
   return render_template('home.html', posts=posts)
   # post = 'hello world'
   # return "Hello World"
@@ -84,6 +72,17 @@ def logout():
   flash(f'You Logout!', 'danger')
   return redirect(url_for('home'))
 
+@app.route('/post/new', methods=['GET', 'POST'])
+@login_required
+def new_post():
+  form = PostForm()
+  if form.validate_on_submit():
+    post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
+    db.session.add(post)
+    db.session.commit()
+    flash(f'Post Success!', 'success')
+    return redirect(url_for('home'))
+  return render_template('post.html', title='New Post', form=form)
 
 if __name__ == '__main__':
   app.run(debug=True)
