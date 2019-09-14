@@ -1,40 +1,18 @@
 # Main
 from flask import Flask, render_template, redirect, url_for, flash
+from flask_login import LoginManager, current_user, login_user, logout_user, UserMixin
+from flask_bcrypt import Bcrypt
+
+# Form
+from form import ResigtrationForm, LoginForm
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
 
-# Form
-from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flask_login import LoginManager, current_user, login_user, logout_user, UserMixin
-from flask_bcrypt import Bcrypt
-
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
-@login_manager.user_loader
-def load_user(user_id):
-  return User.query.get(int(user_id))
-
-class ResigtrationForm(FlaskForm):
-  username = StringField('Username',
-    validators=[DataRequired(), Length(min=2, max=20)])
-  email = StringField('Email',
-    validators=[DataRequired(), Email()])
-  password = PasswordField('Password',
-    validators=[DataRequired()])
-  confirm_password = PasswordField('Confirmation',
-    validators=[DataRequired(), EqualTo('password')])
-  submit = SubmitField('Sign Up')
-
-class LoginForm(FlaskForm):
-  email = StringField('Email',
-    validators=[DataRequired(), Email()])
-  password = PasswordField('Password', validators=[DataRequired()])
-  submit = SubmitField('Login')
 
 
 # DB
@@ -45,6 +23,9 @@ db = SQLAlchemy(app)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
 
+@login_manager.user_loader
+def load_user(user_id):
+  return User.query.get(int(user_id))
 
 class User(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
