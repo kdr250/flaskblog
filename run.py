@@ -9,11 +9,15 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flask_login import LoginManager, current_user, login_user, logout_user
+from flask_login import LoginManager, current_user, login_user, logout_user, UserMixin
 from flask_bcrypt import Bcrypt
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+  return User.query.get(int(user_id))
 
 class ResigtrationForm(FlaskForm):
   username = StringField('Username',
@@ -42,7 +46,7 @@ db = SQLAlchemy(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(20), unique=True, nullable=False)
   email = db.Column(db.String(120), unique=True, nullable=False)
@@ -112,7 +116,6 @@ def login():
   if form.validate_on_submit():
     user = User.query.filter_by(email=form.email.data).first()
     if user and bcrypt.check_password_hash(user.password, form.password.data):
-      # login_user(user)
       login_user(user)
       flash(f'You Login!', 'success')
       return redirect(url_for('home'))
@@ -121,6 +124,7 @@ def login():
 @app.route('/logout')
 def logout():
   logout_user()
+  flash(f'You Logout!', 'danger')
   return redirect(url_for('home'))
 
 
