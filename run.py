@@ -1,7 +1,8 @@
 # Main
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash, request, json, jsonify
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from flask_bcrypt import Bcrypt
+# from flask_bootstrap import Bootstrap
 
 # forms
 from forms import ResigtrationForm, LoginForm, PostForm
@@ -12,6 +13,8 @@ from flask_sqlalchemy import SQLAlchemy
 # Config
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
+
+# bootstrap = Bootstrap(app)
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -83,6 +86,25 @@ def new_post():
     flash(f'Post Success!', 'success')
     return redirect(url_for('home'))
   return render_template('post.html', title='New Post', form=form)
+
+# Ajaxテスト
+@app.route('/hello')
+def hello_view():
+  return render_template('hello.html', title='random_greeting')
+
+# ランダムに投稿を取得してjsonとして返す
+@app.route('/greeting_post', methods=['POST'])
+def greeting_process():
+  # 先程作成したdbtool.pyのメソッド呼び出し
+  post = Post.query.get(request.json["key"])
+  greeting = post.content
+  print(greeting)
+
+  return_json = {
+    'greeting': greeting,
+  }
+  return jsonify(ResultSet=json.dumps(return_json))
+
 
 if __name__ == '__main__':
   app.run(debug=True)
