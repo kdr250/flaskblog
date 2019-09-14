@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
 {% block content %}
-  <h1>{{ post }}</h1>
+{% for post in posts %}
+  <h1>{{ post.title }}</h1>
+  <p>投稿日: {{ post.date_posted.strftime('%Y年%m月%d日') }} By {{ post.author.username }}</p>
+  <p>{{ post.content }}</p>
+  
+{% endfor %}
 {% endblock %}
 
 
