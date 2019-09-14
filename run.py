@@ -42,6 +42,17 @@ def home():
   # post = 'hello world'
   # return "Hello World"
 
+@app.route('/post_ajax', methods=['POST'])
+def post_ajax():
+  title = request.form['title']
+  content = request.form['content']
+  post = Post(title=title, content=content, user_id=current_user.id)
+  db.session.add(post)
+  db.session.commit()
+  return jsonify({'title': title, 'content': content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'), 'authorname': post.author.username})
+  # name = request.form['name']
+  # return jsonify({'result': 'ok', 'value': name})
+
 @app.route('/about')
 def about():
   post = "About Page"
