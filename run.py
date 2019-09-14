@@ -27,11 +27,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
 from models import User, Post
 
 # routes
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
   # posts = Post.query.order_by(Post.date_posted.desc())
   posts = Post.query.all()
-  return render_template('home.html', posts=posts)
+  form = PostForm()
+  if form.validate_on_submit():
+    post = Post(title=form.title.data, content=form.content.data, user_id=current_user.id)
+    db.session.add(post)
+    db.session.commit()
+    flash(f'Post Success!', 'success')
+    return redirect(url_for('home'))
+  return render_template('home.html', posts=posts, form=form)
   # post = 'hello world'
   # return "Hello World"
 

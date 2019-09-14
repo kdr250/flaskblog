@@ -1,11 +1,33 @@
 {% extends 'layout.html' %}
 {% block content %}
+<div class="col-md-8">
 {% for post in posts %}
   <h1>{{ post.title }}</h1>
   <p>投稿日: {{ post.date_posted.strftime('%Y年%m月%d日') }} By {{ post.author.username }}</p>
   <p>{{ post.content }}</p>
-  
 {% endfor %}
+</div>
+{% if current_user.is_authenticated %}
+  <div class="col-md-4">
+    <div class="content-section">
+        <form method="POST" action="">
+              {{ form.hidden_tag() }}
+              <div>
+              {{ form.title.label }} </br>
+              {{ form.title }}
+            </div>
+            <div>
+              {{ form.content.label }} </br>
+              {{ form.content }}
+            </div>
+            <div>
+              {{ form.submit }}
+            </div>
+          </form>
+    </div>
+  </div>
+{% endif %}
+
 {% endblock %}
 
 

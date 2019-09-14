@@ -5,10 +5,13 @@ function post_greeting(num) {
     // data: JSON.stringify({"key":$('input').data('post-id')}),
     data: JSON.stringify({"key":num}),
     contentType: 'application/json',
-    success: function (data) {
-      const greeting = JSON.parse(data.ResultSet).greeting
-      document.getElementById('greeting').innerHTML = greeting
-    }
+  })
+  .done(function (data) {
+    const greeting = JSON.parse(data.ResultSet).greeting
+    document.getElementById('greeting').innerHTML = greeting
+  })
+  .fail(function() {
+    alert('Ajaxに失敗しました');
   })
   // console.log($('input').data('post'))
 }
