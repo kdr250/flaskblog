@@ -12,8 +12,6 @@ $(function() {
   $('#submit').on('click', function(e){
     e.preventDefault();
     console.log('hoge');
-    // title = $('#title').val()
-    // content = $('#content').val()
     $.ajax({
       type: 'POST',
       url: '/post_ajax',
@@ -25,10 +23,6 @@ $(function() {
       $('#message-box').append(html)
       $('#post-form').get(0).reset();
       $('html, body').animate({scrollTop:$('#message-box')[0].scrollHeight});
-      // $(window).animate({scrollTop: 1000});
-      // $('#message-box').animate({ scrollTop: $('#message-box')[0].scrollHeight});
-      // $('#message-box').animate({ scrollTop: $(document).height()},1500);
-      // $('#message-box').animate({scrollTop: $(document).height()},1500);
     })
     .fail(function() {
       alert('Ajaxに失敗しました');
