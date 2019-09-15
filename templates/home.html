@@ -1,11 +1,41 @@
 {% extends 'layout.html' %}
 {% block content %}
+
+
+
+<div id="message-box" class="col-md-8">
 {% for post in posts %}
+<div id="posts">
   <h1>{{ post.title }}</h1>
   <p>投稿日: {{ post.date_posted.strftime('%Y年%m月%d日') }} By {{ post.author.username }}</p>
   <p>{{ post.content }}</p>
-  
+</div>
 {% endfor %}
+</div>
+{% if current_user.is_authenticated %}
+  <div class="col-md-4 offset-md-7" style="position: fixed;">
+    <div class="content-section">
+        <form id="post-form" method="POST" action="">
+              {{ form.hidden_tag() }}
+              <div>
+              {{ form.title.label }} </br>
+              {{ form.title }}
+            </div>
+            <div>
+              {{ form.content.label }} </br>
+              {{ form.content }}
+            </div>
+            <div>
+              {{ form.submit }}
+            </div>
+          </form>
+    </div>
+  </div>
+{% endif %}
+
+<script src="{{url_for('static', filename='js/post.js')}}"></script>
+<!-- <script src="../static/js/post.js"  filename='post.js')}}"></script> -->
+
 {% endblock %}
 
 
