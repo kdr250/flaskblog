@@ -1,11 +1,12 @@
 {% extends 'layout.html' %}
 {% block content %}
 
-
+<script src="{{url_for('static', filename='js/post.js')}}"></script>
+<!-- <script src="../static/js/post.js"  filename='post.js')}}"></script> -->
 
 <div id="message-box" class="col-md-8">
 {% for post in posts %}
-<div id="posts">
+<div class="post-content" id="post-content" data-post-id={{ post.id }}>
   <h1>{{ post.title }}</h1>
   <p>投稿日: {{ post.date_posted.strftime('%Y年%m月%d日') }} By {{ post.author.username }}</p>
   <p>{{ post.content }}</p>
@@ -33,8 +34,7 @@
   </div>
 {% endif %}
 
-<script src="{{url_for('static', filename='js/post.js')}}"></script>
-<!-- <script src="../static/js/post.js"  filename='post.js')}}"></script> -->
+
 
 {% endblock %}
 

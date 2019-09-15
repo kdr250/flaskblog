@@ -49,9 +49,25 @@ def post_ajax():
   post = Post(title=title, content=content, user_id=current_user.id)
   db.session.add(post)
   db.session.commit()
-  return jsonify({'title': title, 'content': content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'), 'authorname': post.author.username})
+  return jsonify({'id': post.id , 'title': title, 'content': content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'), 'authorname': post.author.username})
   # name = request.form['name']
   # return jsonify({'result': 'ok', 'value': name})
+
+@app.route('/post_api', methods=['POST'])
+def post_api():
+  last_post_id = int(request.json["id"])
+  print(last_post_id)
+  posts = Post.query.filter(Post.id > last_post_id).all()
+  # print(posts)    # [Post('aaa', '2019-09-15 04:14:12')]
+  list_json = []
+  for post in posts:
+    dict_json = {'id': post.id, 'title': post.title,
+      'content': post.content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
+      'authorname': post.author.username}
+    list_json.append(dict_json)
+  print(list_json)
+  json = jsonify(list_json)
+  return json
 
 @app.route('/about')
 def about():
@@ -113,7 +129,6 @@ def hello_view():
 # ランダムに投稿を取得してjsonとして返す
 @app.route('/greeting_post', methods=['POST'])
 def greeting_process():
-  # 先程作成したdbtool.pyのメソッド呼び出し
   post = Post.query.get(request.json["key"])
   greeting = post.content
   print(greeting)
