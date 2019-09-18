@@ -1,11 +1,19 @@
 $(function() {
 
   function buildHTML(post){
-    var html = `<div class="post-content" id="post-content" data-post-id=${post.id} >
-    <h1>${post.title}</h1>
-    <p>投稿日: ${post.date_posted} By ${post.authorname}</p>
-    <p>${post.content}</p>
-    </div>`
+    var html = 0
+    if (post.same == 1) {
+      var html_same = `<div class="post-content card col-sm-11 col-md-11 bg-info" data-post-id=${post.id}>`
+    } else { 
+      var html_same = `<div class="post-content card col-sm-11 col-md-11" data-post-id=${post.id}>`
+    }
+    var html = `<div class="card-body">
+      <h5 class="card-title">${post.title}</h5>
+      <h6 class="card-subtitle mb-2">投稿日: ${post.date_posted} By ${post.authorname}</h6>
+      <p class="card-text">${post.content}</p>
+      </div>
+      </div>`
+    html = html_same + html
     return html
   }
 
