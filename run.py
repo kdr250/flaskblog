@@ -49,7 +49,12 @@ def post_ajax():
   post = Post(title=title, content=content, user_id=current_user.id)
   db.session.add(post)
   db.session.commit()
-  return jsonify({'id': post.id , 'title': title, 'content': content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'), 'authorname': post.author.username})
+  same_author = 0
+  if post.author == current_user:
+      same_author = 1
+  return jsonify({'id': post.id , 'title': title, 'content': content,
+                  'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
+                  'authorname': post.author.username, 'same': same_author})
   # name = request.form['name']
   # return jsonify({'result': 'ok', 'value': name})
 
@@ -60,10 +65,13 @@ def post_api():
   posts = Post.query.filter(Post.id > last_post_id).all()
   # print(posts)    # [Post('aaa', '2019-09-15 04:14:12')]
   list_json = []
+  same_author = 0
   for post in posts:
+    if post.author == current_user:
+      same_author = 1
     dict_json = {'id': post.id, 'title': post.title,
       'content': post.content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
-      'authorname': post.author.username}
+      'authorname': post.author.username, 'same': same_author}
     list_json.append(dict_json)
   print(list_json)
   json = jsonify(list_json)
