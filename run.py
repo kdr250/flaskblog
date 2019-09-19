@@ -2,7 +2,12 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, json, jsonify
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from flask_bcrypt import Bcrypt
-# from flask_bootstrap import Bootstrap
+
+# HarryBotter
+import tensorflow as tf
+# import keras
+from keras.models import load_model
+import pickle
 
 # forms
 from forms import ResigtrationForm, LoginForm, PostForm
@@ -14,8 +19,6 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
 
-# bootstrap = Bootstrap(app)
-
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
@@ -25,6 +28,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
 
 # models
 from models import User, Post
+
+# Bot
+# keras.backend.clear_session()
+graph = tf.get_default_graph()
+model=load_model('harrybotter/harry_wakati.h5')
+with open("harrybotter/wakati_harry.picle", mode="rb") as f:
+    wakati_data = pickle.load(f)
+
+# keras.backend.clear_session()
+# graph = tf.get_default_graph()
+
+from harrybotter import run_harry
 
 # routes
 @app.route('/', methods=['GET', 'POST'])
@@ -39,8 +54,6 @@ def home():
     flash(f'Post Success!', 'success')
     return redirect(url_for('home'))
   return render_template('home.html', posts=posts, form=form)
-  # post = 'hello world'
-  # return "Hello World"
 
 @app.route('/post_ajax', methods=['POST'])
 def post_ajax():
@@ -50,13 +63,28 @@ def post_ajax():
   db.session.add(post)
   db.session.commit()
   same_author = 0
+  # Sending content to Bot
+  bot_return = run_harry.run(graph, content)
+  bot_title = f"Re: {title}"
+  bot_post = Post(title=bot_title, content=bot_return, user_id=User.query.filter_by(username="HarryBotter"))
+  db.session.add(bot_post)
+  db.session.commit()
   if post.author == current_user:
       same_author = 1
   return jsonify({'id': post.id , 'title': title, 'content': content,
                   'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
                   'authorname': post.author.username, 'same': same_author})
-  # name = request.form['name']
-  # return jsonify({'result': 'ok', 'value': name})
+
+  # return jsonify({'id': post.id , 'title': title, 'content': content,
+  #                 'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
+  #                 'authorname': post.author.username, 'same': same_author})
+
+# def harrybotter(content):
+#   # Bot
+#   bot_return = run_harry.run(content)
+#   return bot_return
+  
+
 
 @app.route('/post_api', methods=['POST'])
 def post_api():
@@ -149,4 +177,4 @@ def greeting_process():
 
 if __name__ == '__main__':
   app.run(debug=True)
-
+  # print(run_harry.run("おじさん"))
