@@ -8,7 +8,6 @@ from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from keras.optimizers import RMSprop
 from keras.utils.data_utils import get_file
-# import matplotlib.pyplot as plt  # 追加
 import numpy as np
 import random
 # import sys
