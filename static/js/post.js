@@ -1,11 +1,19 @@
 $(function() {
 
   function buildHTML(post){
-    var html = `<div id="posts">
-    <h1>${post.title}</h1>
-    <p>投稿日: ${post.date_posted} By ${post.authorname}</p>
-    <p>${post.content}</p>
-    </div>`
+    var html = 0
+    if (post.same == 1) {
+      var html_same = `<div class="post-content card col-sm-11 col-md-11 bg-info" data-post-id=${post.id}>`
+    } else { 
+      var html_same = `<div class="post-content card col-sm-11 col-md-11" data-post-id=${post.id}>`
+    }
+    var html = `<div class="card-body">
+      <h5 class="card-title">${post.title}</h5>
+      <h6 class="card-subtitle mb-2">投稿日: ${post.date_posted} By ${post.authorname}</h6>
+      <p class="card-text">${post.content}</p>
+      </div>
+      </div>`
+    html = html_same + html
     return html
   }
 
@@ -28,4 +36,44 @@ $(function() {
       alert('Ajaxに失敗しました');
     })
   })
+  var reloadMessages = function() {
+    // lastメソッドはidではなくクラス指定(class="~" => $('.~:last'))出ないと効かない!
+    // last_post_id = $('#post-content').last().data('post-id')
+    var last_post_id = $('.post-content:last').data('post-id')
+    console.log(last_post_id)
+    $.ajax({
+      //ルーティングで設定した通り/groups/id番号/api/messagesとなるよう文字列を書く
+      url: '/post_api',
+      //ルーティングで設定した通りhttpメソッドをgetに指定
+      type: 'POST',
+      // dataType: 'json',
+      // //dataオプションでリクエストに値を含める
+      // data: {id: last_post_id}
+      data: JSON.stringify({"id":last_post_id}),
+      contentType: 'application/json',
+    })
+    .done(function(posts) {
+      //追加するHTMLの入れ物を作る
+      var insertHTML = '';
+
+      //メッセージが入ったHTMLを取得
+      var messege_box = $('#message-box')
+
+      //配列messagesの中身一つ一つを取り出し、HTMLに変換したものを入れ物に足し合わせる
+      console.log(posts)
+
+      if ($.isEmptyObject(posts) == false) {
+        posts.forEach(function(post){
+          var html = buildHTML(post)
+          $(messege_box).append(html);
+        })
+        $('html, body').animate({scrollTop:$('#message-box')[0].scrollHeight});
+        console.log('animated')
+      } 
+    })
+    .fail(function() {
+      alert('error');
+    });
+  };
+  setInterval(reloadMessages, 10000);
 })
