@@ -10,42 +10,23 @@ from keras.optimizers import RMSprop
 from keras.utils.data_utils import get_file
 import numpy as np
 import random
-
-# Main
-from flask import Flask
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-
+# import sys
 import io
 from janome.tokenizer import Tokenizer
 import pickle
 from flask import render_template, redirect, url_for, flash, request, json, jsonify
-from config import app, db, login_manager, bcrypt
-from forms import ResigtrationForm, LoginForm, PostForm
-from models import User, Post
+from flaskblog import app, db, login_manager, bcrypt
+from flaskblog.forms import ResigtrationForm, LoginForm, PostForm
+from flaskblog.models import User, Post
 from flask_login import current_user, login_user, logout_user, login_required
-
-
-
-
-# # Config
-# app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
-
-# bcrypt = Bcrypt(app)
-# login_manager = LoginManager(app)
-
-# db = SQLAlchemy(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
 
 # from harrybotter import run_harry
 # from flaskblog import harrybotter
 
 graph = tf.get_default_graph()
-model=load_model('harrybotter/harry_wakati.h5')
+model=load_model('flaskblog/harrybotter/harry_wakati.h5')
 
-with open("harrybotter/wakati_harry.picle", mode="rb") as f:
+with open("flaskblog/harrybotter/wakati_harry.picle", mode="rb") as f:
     wakati_data = pickle.load(f)
 
 # from flaskblog import model, wakati_data, graph
@@ -262,8 +243,3 @@ def greeting_process():
     'greeting': greeting,
   }
   return jsonify(ResultSet=json.dumps(return_json))
-
-
-if __name__ == '__main__':
-  app.run(debug=True)
-  # print(run_harry.run("おじさん"))
