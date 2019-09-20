@@ -1,16 +1,3 @@
-# テスト
-import tensorflow as tf
-# import keras
-from keras.backend import tensorflow_backend as backend
-from keras.callbacks import LambdaCallback
-from keras.models import Sequential, load_model
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
-import numpy as np
-import random
-
 # Main
 from flask import Flask
 from flask_login import LoginManager
@@ -26,12 +13,26 @@ from forms import ResigtrationForm, LoginForm, PostForm
 from models import User, Post
 from flask_login import current_user, login_user, logout_user, login_required
 
+# Bot
+import tensorflow as tf
+import keras
+from keras.backend import tensorflow_backend as backend
+from keras.callbacks import LambdaCallback
+from keras.models import Sequential, load_model
+from keras.layers import Dense, Activation
+from keras.layers import LSTM
+from keras.optimizers import RMSprop
+from keras.utils.data_utils import get_file
+import numpy as np
+import random
 
 
-
-# # Config
+# Config
 # app = Flask(__name__)
 # app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
+
+
+
 
 # bcrypt = Bcrypt(app)
 # login_manager = LoginManager(app)
@@ -42,17 +43,31 @@ from flask_login import current_user, login_user, logout_user, login_required
 # from harrybotter import run_harry
 # from flaskblog import harrybotter
 
-graph = tf.get_default_graph()
+# モデル読み込み
 model=load_model('harrybotter/harry_wakati.h5')
-
+model._make_predict_function()
+graph = tf.compat.v1.get_default_graph()
 with open("harrybotter/wakati_harry.picle", mode="rb") as f:
-    wakati_data = pickle.load(f)
-
-# from flaskblog import model, wakati_data, graph
-
+      wakati_data = pickle.load(f)
 # keras.backend.clear_session()
 
+bot_user_id = User.query.filter_by(username="HarryBotter").first().id
 
+# model = None
+# wakati_data = None
+# graph = None
+
+def bot_model():
+  global model
+  model = load_model('harrybotter/harry_wakati.h5')
+  # global graph
+  # graph = tf.get_default_graph()
+  # graph = tf.compat.v1.get_default_graph
+  global wakati_data
+  with open("harrybotter/wakati_harry.picle", mode="rb") as f:
+      wakati_data = pickle.load(f)
+
+# モデルを実行するための関数
 def sample(preds, temperature=1.0):
     # helper function to sample an index from a probability array
     preds = np.asarray(preds).astype('float64')
@@ -165,7 +180,8 @@ def post_ajax():
   # Sending content to Bot
   bot_return = bot_run(content)
   bot_title = f"Re: {title}"
-  bot_post = Post(title=bot_title, content=bot_return, user_id=User.query.filter_by(username="HarryBotter"))
+  global bot_user_id
+  bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
   db.session.add(bot_post)
   db.session.commit()
   if post.author == current_user:
@@ -265,5 +281,6 @@ def greeting_process():
 
 
 if __name__ == '__main__':
+  # bot_model()
   app.run(debug=True)
   # print(run_harry.run("おじさん"))
