@@ -26,46 +26,24 @@ from keras.utils.data_utils import get_file
 import numpy as np
 import random
 
-
-# Config
-# app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
-
-
-
-
-# bcrypt = Bcrypt(app)
-# login_manager = LoginManager(app)
-
-# db = SQLAlchemy(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
-
-# from harrybotter import run_harry
-# from flaskblog import harrybotter
-
-# モデル読み込み
+# モデルや辞書・リストを先に読み込み
 model=load_model('harrybotter/harry_wakati.h5')
 model._make_predict_function()
 graph = tf.compat.v1.get_default_graph()
 with open("harrybotter/wakati_harry.picle", mode="rb") as f:
       wakati_data = pickle.load(f)
-# keras.backend.clear_session()
+
+maxlen = 20
+step = 1
+chars = sorted(list(set(wakati_data)))
+char_indices = dict((c, i) for i, c in enumerate(chars))
+indices_char = dict((i, c) for i, c in enumerate(chars))
+next_chars = []
+for i in range(0, len(wakati_data) - maxlen, step):
+    next_chars.append(wakati_data[i + maxlen])
 
 bot_user_id = User.query.filter_by(username="HarryBotter").first().id
 
-# model = None
-# wakati_data = None
-# graph = None
-
-def bot_model():
-  global model
-  model = load_model('harrybotter/harry_wakati.h5')
-  # global graph
-  # graph = tf.get_default_graph()
-  # graph = tf.compat.v1.get_default_graph
-  global wakati_data
-  with open("harrybotter/wakati_harry.picle", mode="rb") as f:
-      wakati_data = pickle.load(f)
 
 # モデルを実行するための関数
 def sample(preds, temperature=1.0):
@@ -78,40 +56,21 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 def bot_run(input_words=""):
-    # graph = tf.get_default_graph()
-
-    chars = sorted(list(set(wakati_data)))
-    char_indices = dict((c, i) for i, c in enumerate(chars))
-    indices_char = dict((i, c) for i, c in enumerate(chars))
-
-
-    # cut the words in semi-redundant sequences of maxlen words
-    maxlen = 20
-    step = 1
-    sentences = []
-    next_chars = []
-    for i in range(0, len(wakati_data) - maxlen, step):
-        sentences.append(wakati_data[i: i + maxlen])
-        next_chars.append(wakati_data[i + maxlen])
-
-    # Function invoked at end of each epoch. Prints generated word.
+    global char_indices
+    global indices_char
+    global next_chars
+    
     print()
     print('----- Generating word after Epoch:')
 
     tokenizer = Tokenizer()
 
     start_index = random.randint(0, len(wakati_data) - maxlen - 1)
-    # start_index = 0  # 毎回、「彼は老いていた」から文章生成
-    for diversity in [0.2]:  # diversity = 0.2 のみとする
+
+    for diversity in [0.2]:  # diversityは今回、一つの値で実施
         print('----- diversity:', diversity)
 
         generated = ''
-        # sentence = wakati_data[start_index:start_inde+maxlen]
-        # sentence = ''.join(wakati_data[start_index:start_inde+maxlen])
-        # input_words = "クィディッチ"
-        # input_words = "箒は得意"
-        # input_words = "菩薩は得意だよ"
-        # input_words = "君の目にマルフォイしている"
         input_words = input_words
         input_word = tokenizer.tokenize(input_words, wakati=True)
         input_word = list(val_word for val_word in input_word if val_word in wakati_data)
@@ -121,10 +80,8 @@ def bot_run(input_words=""):
         sentence = wakati_data[start_index:start_index+maxlen]
         generated += ''.join(input_word)
         print('----- Generating with seed: "' + ''.join(input_word) + '"')
-        # sys.stdout.write(generated)
 
         for i in range(80):
-            # keras.backend.clear_session()
             x_pred = np.zeros((1, maxlen, len(chars)))
             if i == 0:
                 arg_str = input_word
@@ -139,16 +96,11 @@ def bot_run(input_words=""):
                 
             next_index = sample(preds, diversity)
             next_char = indices_char[next_index]
-            # print("next_char= ", next_char)
 
             generated += next_char
             sentence = sentence[1:]
             sentence.append(next_char)
-            # sentence = wakati_data[next_char]
 
-            
-            # sys.stdout.write(next_char)
-            # sys.stdout.flush()
             if (next_char == "！") or (next_char == "？") or (next_char == "。"):
                 break
 
@@ -158,7 +110,6 @@ def bot_run(input_words=""):
 # routes
 @app.route('/', methods=['GET', 'POST'])
 def home():
-  # posts = Post.query.order_by(Post.date_posted.desc())
   posts = Post.query.all()
   form = PostForm()
   if form.validate_on_submit():
@@ -177,6 +128,8 @@ def post_ajax():
   db.session.add(post)
   db.session.commit()
   same_author = 0
+  if post.author == current_user:
+      same_author = 1
   # Sending content to Bot
   bot_return = bot_run(content)
   bot_title = f"Re: {title}"
@@ -184,19 +137,15 @@ def post_ajax():
   bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
   db.session.add(bot_post)
   db.session.commit()
-  if post.author == current_user:
-      same_author = 1
   return jsonify({'id': post.id , 'title': title, 'content': content,
                   'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
                   'authorname': post.author.username, 'same': same_author})
-
 
 @app.route('/post_api', methods=['POST'])
 def post_api():
   last_post_id = int(request.json["id"])
   print(last_post_id)
   posts = Post.query.filter(Post.id > last_post_id).all()
-  # print(posts)    # [Post('aaa', '2019-09-15 04:14:12')]
   list_json = []
   same_author = 0
   for post in posts:
@@ -222,7 +171,6 @@ def register():
     return redirect(url_for('home'))
   form = ResigtrationForm()
   if form.validate_on_submit():
-    # password = form.password.data
     hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
     user = User(username=form.username.data, email=form.email.data, password=hashed_password)
     db.session.add(user)
@@ -262,25 +210,5 @@ def new_post():
     return redirect(url_for('home'))
   return render_template('post.html', title='New Post', form=form)
 
-# Ajaxテスト
-@app.route('/hello')
-def hello_view():
-  return render_template('hello.html', title='random_greeting')
-
-# ランダムに投稿を取得してjsonとして返す
-@app.route('/greeting_post', methods=['POST'])
-def greeting_process():
-  post = Post.query.get(request.json["key"])
-  greeting = post.content
-  print(greeting)
-
-  return_json = {
-    'greeting': greeting,
-  }
-  return jsonify(ResultSet=json.dumps(return_json))
-
-
 if __name__ == '__main__':
-  # bot_model()
   app.run(debug=True)
-  # print(run_harry.run("おじさん"))
