@@ -1,7 +1,7 @@
 body {
   background: #fafafa;
   color: #333333;
-  margin-top: 5rem;
+  /* margin-top: 5rem; */
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -22,6 +22,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .site-header .navbar-nav .nav-link.active {
   font-weight: 500;
+}
+
+
+.site-header-pict{
+  width: 100vw;
+  height: 100vh;
+  /* height: 600px; */
+}
+
+.main-margin{
+  margin-top: 70px !important;
 }
 
 .content-section {
@@ -82,4 +93,88 @@ a.article-title:hover {
 .post-content {
   border-radius: 30px;
   margin-bottom: 20px;
+}
+
+.harrybotter-font {
+  font-family: "cursive";
+  font-style: oblique !important;
+}
+
+.index-button{
+  height: 60px;
+  width: 300px;
+  margin-bottom: 10px;
+}
+
+/* 吹き出し 左向き */
+.balloon1-left {
+  position: relative;
+  display: inline-block;
+  margin: 0.5em 0 0.5em 10px;
+  padding: 7px 10px;
+  /* min-width: 120px;
+  max-width: 100%; */
+  width: 55%;
+  padding-left: 15px;
+  color: #555;
+  font-size: 16px;
+  background: #e0edff;
+  border-radius: 15px;
+}
+
+.balloon1-left:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -30px;
+  margin-top: -15px;
+  border: 15px solid transparent;
+  border-right: 15px solid #e0edff;
+}
+
+.balloon1-left p {
+  margin: 0;
+  padding: 0;
+}
+
+/* 吹き出し 右向き */
+.balloon1-right {
+  position: relative;
+  display: inline-block;
+  /* margin: 1.5em 15px 1.5em 0; */
+  margin: 10px 15px 10px auto;
+  padding: 7px 10px;
+  /* min-width: 120px;
+  max-width: 100%; */
+  width: 50%;
+  padding-left: 15px;
+  color: #555;
+  font-size: 16px;
+  background: #30e852;
+  border-radius: 15px;
+}
+
+.balloon1-right:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-top: -15px;
+  border: 15px solid transparent;
+  border-left: 15px solid #30e852;
+}
+
+.balloon1-right p {
+  margin: 0;
+  padding: 0;
+}
+
+.post-right{
+  margin: 0 0 0 auto;
+}
+
+.post-pict{
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
 }
