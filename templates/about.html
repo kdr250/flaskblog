@@ -1,5 +1,36 @@
 {% extends 'layout.html' %}
 {% block content %}
-  <h1>{{ post }}</h1>
+
+<main role="main" class="container main-margin">
+  <div class="row">
+    <h1>チャットボットの使い方</h1>
+  </div>
+  <div class="card" style="width: 50%; margin-top: 10px; border-color: grey;">
+    <img src="static/images/flaskblog01.png" class="card-img-top" alt="..." style="height: 100%; width: 100%;">
+    <div class="card-body">
+      <h5 class="card-title">まずはユーザー登録から</h5>
+      <p class="card-text">チャットボットでは、どなたの発言かを識別するために</br>ユーザー登録をお願いしております</p>
+      <a href="{{ url_for('register') }}" class="btn btn-primary">ユーザー登録</a>
+    </div>
+  </div>
+  <div class="card" style="width: 50%; margin-top: 35px; border-color: grey;">
+    <img src="static/images/flaskblog02.png" class="card-img-top" alt="..." style="height: 100%; width: 100%;">
+    <div class="card-body">
+      <h5 class="card-title">次にログイン</h5>
+      <p class="card-text">ログインをお願いします</p>
+      <a href="{{ url_for('login') }}" class="btn btn-primary">ログイン</a>
+    </div>
+  </div>
+  <div class="card" style="width: 50%; margin-top: 35px; border-color: grey;">
+    <img src="static/images/flaskblog03.png" class="card-img-top" alt="..." style="height: 100%; width: 100%;">
+    <div class="card-body">
+      <h5 class="card-title">チャット開始！</h5>
+      <p class="card-text">ユーザー登録・ログインが完了しましたら、いよいよチャットを開始できます。
+        投稿フォームにタイトルと会話内容を記入して投稿してください。約10秒程度でチャットボットからの応答が届きます！</p>
+      <a href="{{ url_for('home') }}" class="btn btn-primary">チャット開始</a>
+    </div>
+  </div>
+</main>
+
 {% endblock %}
 

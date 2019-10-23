@@ -2,26 +2,38 @@
 {% block content %}
 
 <script src="{{url_for('static', filename='js/post.js')}}"></script>
-<!-- <script src="../static/js/post.js"  filename='post.js')}}"></script> -->
+
+<main role="main" class="container main-margin">
+<div class="row">
 
 <div id="message-box" class="col-md-8">
-
-    
-
-{% for post in posts %}
-  {% if post.author == current_user %}
-  <div class="post-content card col-sm-11 col-md-11 bg-info" data-post-id={{ post.id }}>
-  {% else %}
-    <div class="post-content card col-sm-11 col-md-11" data-post-id={{ post.id }}>
-  {% endif %}
-    <div class="card-body">
-      <h5 class="card-title">{{ post.title }}</h5>
-      <h6 class="card-subtitle mb-2">投稿日: {{ post.date_posted.strftime('%Y年%m月%d日') }} By {{ post.author.username }}</h6>
-      <p class="card-text">{{ post.content }}</p>
-    </div>
-  </div>
-{% endfor %}
-
+  {% for post in posts %}
+    {% if post.author == current_user %}
+      <div class="media post-right" data-post-id={{ post.id }}>
+        <!-- <img src="static/images/user_icon.png" class="mr-3" alt="..."> -->
+        <div class="balloon1-right">
+          <h5>{{ post.title }}  <small>by {{ post.author.username }}</small></h5>
+          <p>{{ post.content }}</p>
+        </div>
+      </div>
+    {% elif post.author.username == "HarryBotter" %}
+      <div class="media" data-post-id={{ post.id }}>
+        <img src="static/images/chatbot_icon.png" class="mr-3 post-pict" alt="...">
+        <div class="balloon1-left">
+            <h5>{{ post.title }}  <small>by {{ post.author.username }}</small></h5>
+            <p>{{ post.content }}</p>
+        </div>
+      </div>
+    {% else %}
+      <div class="media" data-post-id={{ post.id }}>
+        <img src="static/images/user_icon.png" class="mr-3 post-pict" alt="...">
+        <div class="balloon1-left">
+          <h5>{{ post.title }}  <small>by {{ post.author.username }}</small></h5>
+          <p>{{ post.content }}</p>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
 </div>
 
 {% if current_user.is_authenticated %}
@@ -30,22 +42,23 @@
         <form id="post-form" method="POST" action="">
               {{ form.hidden_tag() }}
               <div lass="form-group">
-              {{ form.title.label }} </br>
+              {{ form.title.label(class='harrybotter-font') }} </br>
               {{ form.title(class='form-control') }}
             </div>
             <div lass="form-group">
-              {{ form.content.label }} </br>
+              {{ form.content.label(class='harrybotter-font') }} </br>
               {{ form.content(class='form-control') }}
             </div>
             <div style="padding-top: 10px; padding-left: 45%;">
-              {{ form.submit(class='btn btn-primary') }}
+              {{ form.submit(class='btn btn-primary harrybotter-font') }}
             </div>
           </form>
     </div>
   </div>
 {% endif %}
 
-
+</div>
+</main>
 
 {% endblock %}
 

@@ -1,20 +1,24 @@
 {% extends 'layout.html' %}
 {% block content %}
+<main role="main" class="container main-margin">
+<div class="row">
 <div style="margin-top: 80px;">
   <form method="POST" action="">
     <div>
       {{ form.hidden_tag() }}
     
-      {{ form.title.label }}
+      {{ form.title.label(class='harrybotter-font') }}
       {{ form.title }}
     </div>
     <div>
-      {{ form.content.label }}
+      {{ form.content.label(class='harrybotter-font') }}
       {{ form.content }}
     </div>
     <div>
-      {{ form.submit }}
+      {{ form.submit(class='harrybotter-font') }}
     </div>
   </form>
 </div>
+</div>
+</main>
 {% endblock %}

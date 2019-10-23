@@ -108,7 +108,12 @@ def bot_run(input_words=""):
 
 
 # routes
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
+def index():
+  return render_template('index.html')
+
+
+@app.route('/home', methods=['GET', 'POST'])
 def home():
   posts = Post.query.all()
   form = PostForm()
@@ -161,9 +166,8 @@ def post_api():
 
 @app.route('/about')
 def about():
-  post = "About Page"
   title = "About"
-  return render_template('about.html', post=post, title=title)
+  return render_template('about.html', title=title)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -176,7 +180,7 @@ def register():
     db.session.add(user)
     db.session.commit()
     flash(f'Account Created! Now Login!', 'success')
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
   return render_template('register.html', form=form, title='Register')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -196,7 +200,7 @@ def login():
 def logout():
   logout_user()
   flash(f'You Logout!', 'danger')
-  return redirect(url_for('home'))
+  return redirect(url_for('index'))
 
 @app.route('/post/new', methods=['GET', 'POST'])
 @login_required

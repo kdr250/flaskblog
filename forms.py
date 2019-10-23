@@ -1,9 +1,8 @@
 # Form
 from flask_wtf import FlaskForm
-# from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-
+from models import User
 
 class ResigtrationForm(FlaskForm):
   username = StringField('Username',
@@ -15,6 +14,16 @@ class ResigtrationForm(FlaskForm):
   confirm_password = PasswordField('Confirmation',
     validators=[DataRequired(), EqualTo('password')])
   submit = SubmitField('Sign Up')
+
+  def validate_username(self, username):
+    user = User.query.filter_by(username=username.data).first()
+    if user:
+      raise ValidationError('入力されたユーザー名は他のユーザーによって既に使われています')
+
+  def validate_email(self, email):
+    email = User.query.filter_by(email=email.data).first()
+    if email:
+      raise ValidationError('入力されたEmailは他のユーザーによって既に使われています')
 
 class LoginForm(FlaskForm):
   email = StringField('Email',

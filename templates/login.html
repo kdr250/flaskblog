@@ -1,21 +1,55 @@
 {% extends 'layout.html' %}
 {% block content %}
+<main role="main" class="container main-margin">
+<div class="row">
 <div>
   <form method="POST" action="">
     <div>
     {{ form.hidden_tag() }}
+    <fieldset class="form-group">
+        <legend class="border-bottom mb-4">ログイン</legend>
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label") }}
 
-    {{ form.email.label }}
-    {{ form.email }}
-    </div>
-    <div>
-      {{ form.password.label }}
-      {{ form.password }}
-    </div>
-    <div>
-      {{ form.submit }} 
-    </div>
-  </form>
+            {% if form.email.errors %}
+              {{ form.email(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for errors in form.email.errors %}
+                    <span>{{ errors }}</span>
+                  {% endfor %}
+                </div>
+            {% else %}
+              {{ form.email(class="form-control form-control-lg") }}
+            {% endif %}
+            
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class="form-control-label") }}
+
+            {% if form.password.errors %}
+              {{ form.password(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                  {% for errors in form.password.errors %}
+                    <span>{{ errors }}</span>
+                  {% endfor %}
+                </div>
+            {% else %}
+              {{ form.password(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+      </fieldset>
+      <div class="form-group">
+        {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+    </form>
+  <div>
+  </br>
+      アカウント未作成の場合は、下記のリンクから登録お願いします。
+      <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+  </div>
 </div>
+
+</div>
+</main>
 
 {% endblock %}
