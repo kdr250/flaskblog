@@ -1,19 +1,8 @@
-$(function() {
+$(document).ready(function(){
+
+  var ajax_count = 0
 
   function buildHTML(post){
-    // var html = ''
-    // if (post.same == 1) {
-    //   var html_same = `<div class="post-content card col-sm-11 col-md-11 bg-info" data-post-id=${post.id}>`
-    // } else { 
-    //   var html_same = `<div class="post-content card col-sm-11 col-md-11" data-post-id=${post.id}>`
-    // }
-    // var html = `<div class="card-body">
-    //   <h5 class="card-title">${post.title}</h5>
-    //   <h6 class="card-subtitle mb-2">投稿日: ${post.date_posted} By ${post.authorname}</h6>
-    //   <p class="card-text">${post.content}</p>
-    //   </div>
-    //   </div>`
-    // html = html_same + html
     if (post.same == 1){
       var html = `<div class="media post-right" data-post-id=${post.id}>
         <div class="balloon1-right">
@@ -43,6 +32,7 @@ $(function() {
 
   $('#submit').on('click', function(e){
     e.preventDefault();
+    ajax_count = 1
     console.log('hoge');
     $.ajax({
       type: 'POST',
@@ -55,13 +45,19 @@ $(function() {
       $('#message-box').append(html)
       $('#post-form').get(0).reset();
       $('html, body').animate({scrollTop:$('#message-box')[0].scrollHeight});
+      ajax_count = 0
     })
     .fail(function() {
       alert('Ajaxに失敗しました');
+      ajax_count = 0
     })
   })
+
   var reloadMessages = function() {
-    // lastメソッドはidではなくクラス指定(class="~" => $('.~:last'))出ないと効かない!
+    if (ajax_count == 1){
+      return
+    }
+    // lastメソッドはidではなくクラス指定(class="~" => $('.~:last'))でないと効かない!
     // last_post_id = $('#post-content').last().data('post-id')
     var last_post_id = $('.media:last').data('post-id')
     console.log(last_post_id)
@@ -99,5 +95,7 @@ $(function() {
       alert('error');
     });
   };
-  setInterval(reloadMessages, 10000);
+
+  setInterval(reloadMessages, 15000);
+  
 })

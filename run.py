@@ -150,7 +150,8 @@ def post_ajax():
 def post_api():
   last_post_id = int(request.json["id"])
   print(last_post_id)
-  posts = Post.query.filter(Post.id > last_post_id).all()
+  posts = db.session.query(Post).filter(Post.id > last_post_id).all()
+  print(posts)
   list_json = []
   same_author = 0
   for post in posts:
