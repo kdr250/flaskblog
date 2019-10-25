@@ -10,7 +10,6 @@
   {% for post in posts %}
     {% if post.author == current_user %}
       <div class="media post-right" data-post-id={{ post.id }}>
-        <!-- <img src="static/images/user_icon.png" class="mr-3" alt="..."> -->
         <div class="balloon1-right">
           <h5>{{ post.title }}  <small>by {{ post.author.username }}</small></h5>
           <p>{{ post.content }}</p>
