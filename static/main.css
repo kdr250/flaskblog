@@ -178,3 +178,11 @@ a.article-title:hover {
   height: 65px;
   border-radius: 50%;
 }
+
+.padding-top-30{
+  padding-top: 30px;
+}
+
+.padding-top-50{
+  padding-top: 50px !important;
+}
