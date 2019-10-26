@@ -149,9 +149,7 @@ def post_ajax():
 @app.route('/post_api', methods=['POST'])
 def post_api():
   last_post_id = int(request.json["id"])
-  print(last_post_id)
   posts = db.session.query(Post).filter(Post.id > last_post_id).all()
-  print(posts)
   list_json = []
   same_author = 0
   for post in posts:
@@ -161,7 +159,6 @@ def post_api():
       'content': post.content, 'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
       'authorname': post.author.username, 'same': same_author}
     list_json.append(dict_json)
-  print(list_json)
   json = jsonify(list_json)
   return json
 
@@ -198,7 +195,6 @@ def login():
       return redirect(url_for('home'))
     else:
       password_incorrect = 1
-  print(f'password_incorrect = {password_incorrect}')
   return render_template('login.html', form=form, title='Login', password_incorrect=password_incorrect)
 
 @app.route('/logout')
