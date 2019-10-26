@@ -42,7 +42,7 @@ next_chars = []
 for i in range(0, len(wakati_data) - maxlen, step):
     next_chars.append(wakati_data[i + maxlen])
 
-bot_user_id = User.query.filter_by(username="HarryBotter").first().id
+bot_user_id = User.query.filter_by(username="ChatBotter").first().id
 
 
 # モデルを実行するための関数
@@ -150,7 +150,8 @@ def post_ajax():
 def post_api():
   last_post_id = int(request.json["id"])
   print(last_post_id)
-  posts = Post.query.filter(Post.id > last_post_id).all()
+  posts = db.session.query(Post).filter(Post.id > last_post_id).all()
+  print(posts)
   list_json = []
   same_author = 0
   for post in posts:
@@ -188,13 +189,17 @@ def login():
   if current_user.is_authenticated:
     return redirect(url_for('home'))
   form = LoginForm()
+  password_incorrect = 0
   if form.validate_on_submit():
     user = User.query.filter_by(email=form.email.data).first()
     if user and bcrypt.check_password_hash(user.password, form.password.data):
       login_user(user)
       flash(f'You Login!', 'success')
       return redirect(url_for('home'))
-  return render_template('login.html', form=form, title='Login')
+    else:
+      password_incorrect = 1
+  print(f'password_incorrect = {password_incorrect}')
+  return render_template('login.html', form=form, title='Login', password_incorrect=password_incorrect)
 
 @app.route('/logout')
 def logout():
@@ -213,6 +218,7 @@ def new_post():
     flash(f'Post Success!', 'success')
     return redirect(url_for('home'))
   return render_template('post.html', title='New Post', form=form)
+
 
 if __name__ == '__main__':
   app.run(debug=True)
