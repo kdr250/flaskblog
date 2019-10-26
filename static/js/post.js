@@ -3,19 +3,19 @@ $(document).ready(function(){
   var ajax_count = 0
 
   function buildHTML(post){
-    if (post.same == 1){
+    if (post.authorname == 'ChatBotter') {
+    var html = `<div class="media" data-post-id=${post.id}>
+      <img src="static/images/chatbot_icon.png" class="mr-3 post-pict" alt="...">
+      <div class="balloon1-left">
+          <h5>${post.title}  <small>by ${post.authorname}</small></h5>
+          <p>${post.content}</p>
+      </div>
+      </div>`
+    } else if (post.same == 1){
       var html = `<div class="media post-right" data-post-id=${post.id}>
         <div class="balloon1-right">
           <h5>${post.title}  <small>by ${post.authorname}</small></h5>
           <p>${post.content}</p>
-        </div>
-      </div>`
-    } else if (post.authorname == 'HarryBotter') {
-      var html = `<div class="media" data-post-id=${post.id}>
-        <img src="static/images/chatbot_icon.png" class="mr-3 post-pict" alt="...">
-        <div class="balloon1-left">
-            <h5>${post.title}  <small>by ${post.authorname}</small></h5>
-            <p>${post.content}</p>
         </div>
       </div>`
     } else {

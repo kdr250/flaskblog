@@ -3,6 +3,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+import os
 
 # Config
 app = Flask(__name__)
@@ -12,25 +13,8 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
 db = SQLAlchemy(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/flaskblog'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'mysql://root:@localhost/flaskblog'
 
-# # HarryBotter
-# import tensorflow as tf
-# # import keras
-# from keras.models import load_model
-# import pickle
-
-# Bot
-# keras.backend.clear_session()
-# graph = tf.get_default_graph()
-# model=load_model('flaskblog/harrybotter/harry_wakati.h5')
-# with open("flaskblog/harrybotter/wakati_harry.picle", mode="rb") as f:
-#     wakati_data = pickle.load(f)
-
-# keras.backend.clear_session()
-# graph = tf.get_default_graph()
-
-# from flaskblog import routes
-
+# SQLiteの場合は下記
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
 

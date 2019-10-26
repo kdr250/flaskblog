@@ -42,7 +42,7 @@ next_chars = []
 for i in range(0, len(wakati_data) - maxlen, step):
     next_chars.append(wakati_data[i + maxlen])
 
-bot_user_id = User.query.filter_by(username="HarryBotter").first().id
+bot_user_id = User.query.filter_by(username="ChatBotter").first().id
 
 
 # モデルを実行するための関数
@@ -218,13 +218,6 @@ def new_post():
     flash(f'Post Success!', 'success')
     return redirect(url_for('home'))
   return render_template('post.html', title='New Post', form=form)
-
-# ユーザーマイページ
-@app.route('/user/<int:user_id>')
-@login_required
-def profile(user_id):
-  user = User.query.filter_by(id=user_id).first()
-  return render_template('profile.html', user=user)
 
 
 if __name__ == '__main__':
