@@ -12,10 +12,11 @@ app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991a
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
+# ローカル環境がMySQLの場合
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'mysql://root:@localhost/flaskblog'
 db = SQLAlchemy(app)
 
-
-# SQLiteの場合は下記
+# ローカル環境がSQLiteの場合
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+# db = SQLAlchemy(app)
 
