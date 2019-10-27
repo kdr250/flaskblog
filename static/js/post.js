@@ -33,14 +33,12 @@ $(document).ready(function(){
   $('#submit').on('click', function(e){
     e.preventDefault();
     ajax_count = 1
-    console.log('hoge');
     $.ajax({
       type: 'POST',
       url: '/post_ajax',
       data: $(this).parent().parent('form').serialize(),
     })
     .done(function (data) {
-      console.log('Ajax成功!')
       var html = buildHTML(data)
       $('#message-box').append(html)
       $('#post-form').get(0).reset();
@@ -73,7 +71,7 @@ $(document).ready(function(){
       //メッセージが入ったHTMLを取得
       var messege_box = $('#message-box')
 
-      //配列messagesの中身一つ一つを取り出し、HTMLに変換したものを入れ物に足し合わせる
+      //配列の中身一つ一つを取り出し、HTMLに変換したものを入れ物に足し合わせる
       if ($.isEmptyObject(posts) == false) {
         posts.forEach(function(post){
           var html = buildHTML(post)
