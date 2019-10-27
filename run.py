@@ -1,12 +1,14 @@
 # Main
-from flask import Flask
+from flask import Flask, Response, render_template, redirect, url_for, flash, request, json, jsonify
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
 import io
 import pickle
-from flask import render_template, redirect, url_for, flash, request, json, jsonify
+import threading
+
+
 from config import app, db, login_manager, bcrypt
 from forms import ResigtrationForm, LoginForm, PostForm
 from models import User, Post
@@ -80,26 +82,36 @@ def home():
     return redirect(url_for('home'))
   return render_template('home.html', posts=posts, form=form)
 
+
 @app.route('/post_ajax', methods=['POST'])
 def post_ajax():
   title = request.form['title']
   content = request.form['content']
+
   post = Post(title=title, content=content, user_id=current_user.id)
   db.session.add(post)
   db.session.commit()
-  same_author = 0
-  if post.author == current_user:
-      same_author = 1
-  # Sending content to Bot
-  bot_return = bot_run(content)
-  bot_title = f"Re: {title}"
-  global bot_user_id
-  bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
-  db.session.add(bot_post)
-  db.session.commit()
+  same_author = 1
+    
+  def start_answer(title, content):
+    # Sending content to Bot
+    bot_return = bot_run(content)
+    bot_title = f"Re: {title}"
+    global bot_user_id
+    bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
+    db.session.add(bot_post)
+    db.session.commit()
+  
+  thread = threading.Thread(target=start_answer, kwargs={'title': title, 'content': content})
+  thread.start()
+
   return jsonify({'id': post.id , 'title': title, 'content': content,
-                  'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
-                  'authorname': post.author.username, 'same': same_author})
+                'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
+                'authorname': post.author.username, 'same': same_author})
+
+  # return Response(generate(title, content, current_user.id), mimetype='application/json')
+
+  
 
 @app.route('/post_api', methods=['POST'])
 def post_api():
