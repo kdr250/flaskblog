@@ -54,21 +54,15 @@ $(document).ready(function(){
   })
 
   var reloadMessages = function() {
-    if (ajax_count == 1){
+    if (ajax_count == 1 || $('.media').length == 0){
       return
     }
     // lastメソッドはidではなくクラス指定(class="~" => $('.~:last'))でないと効かない!
-    // last_post_id = $('#post-content').last().data('post-id')
     var last_post_id = $('.media:last').data('post-id')
-    console.log(last_post_id)
+    
     $.ajax({
-      //ルーティングで設定した通り/groups/id番号/api/messagesとなるよう文字列を書く
       url: '/post_api',
-      //ルーティングで設定した通りhttpメソッドをgetに指定
       type: 'POST',
-      // dataType: 'json',
-      // //dataオプションでリクエストに値を含める
-      // data: {id: last_post_id}
       data: JSON.stringify({"id":last_post_id}),
       contentType: 'application/json',
     })
@@ -80,15 +74,12 @@ $(document).ready(function(){
       var messege_box = $('#message-box')
 
       //配列messagesの中身一つ一つを取り出し、HTMLに変換したものを入れ物に足し合わせる
-      console.log(posts)
-
       if ($.isEmptyObject(posts) == false) {
         posts.forEach(function(post){
           var html = buildHTML(post)
           $(messege_box).append(html);
         })
         $('html, body').animate({scrollTop:$('#message-box')[0].scrollHeight});
-        console.log('animated')
       } 
     })
     .fail(function() {
