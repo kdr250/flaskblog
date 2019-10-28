@@ -27,6 +27,7 @@ numpy==1.17.2
 protobuf==3.9.1
 psycopg2-binary==2.8.4
 pycparser==2.19
+pyknp==0.4.1
 PyYAML==5.1.2
 scipy==1.3.1
 six==1.12.0
