@@ -100,10 +100,19 @@ a.article-title:hover {
   font-style: oblique !important;
 }
 
+.index-label-logo{
+  font-size: 1.5rem !important;
+  padding-top: 0.1rem !important;
+}
+
 .index-button{
   height: 60px;
   width: 300px;
   margin-bottom: 10px;
+}
+
+.top-width{
+  width: 100vw;
 }
 
 /* 吹き出し 左向き */
@@ -135,6 +144,7 @@ a.article-title:hover {
 .balloon1-left p {
   margin: 0;
   padding: 0;
+  word-wrap: break-word;
 }
 
 /* 吹き出し 右向き */
@@ -185,4 +195,9 @@ a.article-title:hover {
 
 .padding-top-50{
   padding-top: 50px !important;
+}
+
+.loading-margin{
+  margin-top: 50px;
+  margin-bottom: 50px;
 }

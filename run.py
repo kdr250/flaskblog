@@ -1,110 +1,96 @@
 # Main
-from flask import Flask
+from flask import Flask, Response, render_template, redirect, url_for, flash, request, json, jsonify
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
 import io
-from janome.tokenizer import Tokenizer
 import pickle
-from flask import render_template, redirect, url_for, flash, request, json, jsonify
+import threading
+
+
 from config import app, db, login_manager, bcrypt
 from forms import ResigtrationForm, LoginForm, PostForm
 from models import User, Post
 from flask_login import current_user, login_user, logout_user, login_required
 
-# Bot
+# ChatBot
+import math
 import tensorflow as tf
-import keras
-from keras.backend import tensorflow_backend as backend
-from keras.callbacks import LambdaCallback
-from keras.models import Sequential, load_model
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop
-from keras.utils.data_utils import get_file
-import numpy as np
-import random
 
-# モデルや辞書・リストを先に読み込み
-model=load_model('harrybotter/harry_wakati.h5')
-model._make_predict_function()
-graph = tf.compat.v1.get_default_graph()
-with open("harrybotter/wakati_harry.picle", mode="rb") as f:
-      wakati_data = pickle.load(f)
+from chatbot.chat_answer import Dialog, load_data, initialize_models, encode_request, generate_response
 
-maxlen = 20
-step = 1
-chars = sorted(list(set(wakati_data)))
-char_indices = dict((c, i) for i, c in enumerate(chars))
-indices_char = dict((i, c) for i, c in enumerate(chars))
-next_chars = []
-for i in range(0, len(wakati_data) - maxlen, step):
-    next_chars.append(wakati_data[i + maxlen])
-
+# ChatBot用ユーザーidセット
 bot_user_id = User.query.filter_by(username="ChatBotter").first().id
 
+# ChatBot用データロード、初期設定等
+word_indices ,indices_word ,words ,maxlen_e, maxlen_d ,freq_indices = load_data()
+vec_dim = 400
+n_hidden = int(vec_dim*1.5 )    # 隠れ層の次元
 
-# モデルを実行するための関数
-def sample(preds, temperature=1.0):
-    # helper function to sample an index from a probability array
-    preds = np.asarray(preds).astype('float64')
-    preds = np.log(preds) / temperature
-    exp_preds = np.exp(preds)
-    preds = exp_preds / np.sum(exp_preds)
-    probas = np.random.multinomial(1, preds, 1)
-    return np.argmax(probas)
+# ChatBot用入出力次元
+input_dim = len(words)
+output_dim = math.ceil(len(words) / 8)
+graph = tf.get_default_graph()
 
-def bot_run(input_words=""):
-    global char_indices
-    global indices_char
-    global next_chars
-    
-    print()
-    print('----- Generating word after Epoch:')
 
-    tokenizer = Tokenizer()
+# ChatBotのメイン処理
+def bot_run(input_words):
+    global word_indices 
+    global indices_word
+    global words
+    global maxlen_e
+    global maxlen_d
+    global freq_indices
+    global vec_dim
+    global n_hidden
+    global input_dim
+    global output_dim
+    global graph
 
-    start_index = random.randint(0, len(wakati_data) - maxlen - 1)
+    with graph.as_default():
 
-    for diversity in [0.2]:  # diversityは今回、一つの値で実施
-        print('----- diversity:', diversity)
+      #モデル初期化
+      model, encoder_model ,decoder_model = initialize_models('param_001' ,maxlen_e, maxlen_d,
+                                                              vec_dim, input_dim, output_dim, n_hidden)
 
-        generated = ''
-        input_words = input_words
-        input_word = tokenizer.tokenize(input_words, wakati=True)
-        input_word = list(val_word for val_word in input_word if val_word in wakati_data)
-        if len(input_word) > 20:
-            input_word = input_word[-20:]
+      # 入力文の品詞分解とインデックス化 
+      e_input = encode_request(input_words, maxlen_e, word_indices, words, encoder_model)
 
-        sentence = wakati_data[start_index:start_index+maxlen]
-        generated += ''.join(input_word)
-        print('----- Generating with seed: "' + ''.join(input_word) + '"')
+      # 応答文組み立て
+      decoded_sentence = generate_response(e_input, n_hidden, maxlen_d, output_dim, word_indices, 
+                                              freq_indices, indices_word, encoder_model, decoder_model)
 
-        for i in range(80):
-            x_pred = np.zeros((1, maxlen, len(chars)))
-            if i == 0:
-                arg_str = input_word
-            else:
-                arg_str = sentence
-            for t, char in enumerate(arg_str):
-                x_pred[0, t, char_indices[char]] = 1.
+    return decoded_sentence
 
-            global graph
-            with graph.as_default():
-                preds = model.predict(x_pred, verbose=0)[0]
-                
-            next_index = sample(preds, diversity)
-            next_char = indices_char[next_index]
+# 並列処理
+class MyThread(threading.Thread):
+    def __init__(self, title, content):
+        super(MyThread, self).__init__()
+        self.stop_event = threading.Event()
+        self.title = title
+        self.content = content
 
-            generated += next_char
-            sentence = sentence[1:]
-            sentence.append(next_char)
+    def stop(self):
+        self.stop_event.set()
 
-            if (next_char == "！") or (next_char == "？") or (next_char == "。"):
-                break
+    def run(self):
+        try:
+          bot_return = bot_run(self.content)
+          bot_title = f"Re: {self.title}"
+          global bot_user_id
+          bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
+          db.session.add(bot_post)
+          db.session.commit()
+          
+          # # 定期的にフラグを確認して停止させる
+          # if self.stop_event.is_set():
+              
 
-    return generated
+        finally:
+            print('heavy process is finished\n')
+
+jobs = {}
 
 
 # routes
@@ -125,26 +111,41 @@ def home():
     return redirect(url_for('home'))
   return render_template('home.html', posts=posts, form=form)
 
+
 @app.route('/post_ajax', methods=['POST'])
 def post_ajax():
   title = request.form['title']
   content = request.form['content']
+
   post = Post(title=title, content=content, user_id=current_user.id)
   db.session.add(post)
   db.session.commit()
-  same_author = 0
-  if post.author == current_user:
-      same_author = 1
-  # Sending content to Bot
-  bot_return = bot_run(content)
-  bot_title = f"Re: {title}"
-  global bot_user_id
-  bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
-  db.session.add(bot_post)
-  db.session.commit()
+  same_author = 1
+    
+  # def start_answer(title, content):
+    # Sending content to Bot
+    # bot_return = bot_run(content)
+    # bot_title = f"Re: {title}"
+    # global bot_user_id
+    # bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
+    # db.session.add(bot_post)
+    # db.session.commit()
+  
+  t = MyThread(title, content)
+  t.start()
+  jobs[id] = t
+
+  # thread = threading.Thread(target=start_answer, kwargs={'title': title, 'content': content})
+  # thread.start()
+  # thread.started.clear()
+
   return jsonify({'id': post.id , 'title': title, 'content': content,
-                  'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
-                  'authorname': post.author.username, 'same': same_author})
+                'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
+                'authorname': post.author.username, 'same': same_author})
+
+  # return Response(generate(title, content, current_user.id), mimetype='application/json')
+
+  
 
 @app.route('/post_api', methods=['POST'])
 def post_api():
