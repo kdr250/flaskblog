@@ -29,10 +29,10 @@ import time
 import gc
 import os
 
-# Heroku環境では単語分解にJanomeを使用
+# デプロイ環境では単語分解にJanomeを使用
 from janome.tokenizer import Tokenizer
 
-# 学習およびMac環境では単語分解にJuman++を使用
+# 学習環境では単語分解にJuman++を使用
 # from pyknp import Juman
 # import codecs
 
@@ -490,11 +490,11 @@ def initialize_models(emb_param ,maxlen_e, maxlen_d ,vec_dim, input_dim,output_d
 #*************************************************************************************
 
 def encode_request(cns_input, maxlen_e, word_indices, words, encoder_model) :
-    # Heroku環境ではJanomeを使用
+    # デプロイ環境ではJanomeを使用
     tokenizer = Tokenizer()
     input_text = tokenizer.tokenize(cns_input, wakati=True)
     
-    # 学習およびMac環境ではJumanを使用
+    # 学習環境ではJumanを使用
     # # Use Juman++ in subprocess mode
     # jumanpp = Juman()
     # result = jumanpp.analysis(cns_input)
