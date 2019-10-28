@@ -63,6 +63,35 @@ def bot_run(input_words):
 
     return decoded_sentence
 
+# 並列処理
+class MyThread(threading.Thread):
+    def __init__(self, title, content):
+        super(MyThread, self).__init__()
+        self.stop_event = threading.Event()
+        self.title = title
+        self.content = content
+
+    def stop(self):
+        self.stop_event.set()
+
+    def run(self):
+        try:
+          bot_return = bot_run(self.content)
+          bot_title = f"Re: {self.title}"
+          global bot_user_id
+          bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
+          db.session.add(bot_post)
+          db.session.commit()
+          
+          # # 定期的にフラグを確認して停止させる
+          # if self.stop_event.is_set():
+              
+
+        finally:
+            print('heavy process is finished\n')
+
+jobs = {}
+
 
 # routes
 @app.route('/')
@@ -93,17 +122,22 @@ def post_ajax():
   db.session.commit()
   same_author = 1
     
-  def start_answer(title, content):
+  # def start_answer(title, content):
     # Sending content to Bot
-    bot_return = bot_run(content)
-    bot_title = f"Re: {title}"
-    global bot_user_id
-    bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
-    db.session.add(bot_post)
-    db.session.commit()
+    # bot_return = bot_run(content)
+    # bot_title = f"Re: {title}"
+    # global bot_user_id
+    # bot_post = Post(title=bot_title, content=bot_return, user_id=bot_user_id)
+    # db.session.add(bot_post)
+    # db.session.commit()
   
-  thread = threading.Thread(target=start_answer, kwargs={'title': title, 'content': content})
-  thread.start()
+  t = MyThread(title, content)
+  t.start()
+  jobs[id] = t
+
+  # thread = threading.Thread(target=start_answer, kwargs={'title': title, 'content': content})
+  # thread.start()
+  # thread.started.clear()
 
   return jsonify({'id': post.id , 'title': title, 'content': content,
                 'date_posted': post.date_posted.strftime('%Y年%m月%d日'),
