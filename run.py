@@ -31,32 +31,31 @@ n_hidden = int(vec_dim*1.5 )    # 隠れ層の次元
 # ChatBot用入出力次元
 input_dim = len(words)
 output_dim = math.ceil(len(words) / 8)
-graph = tf.get_default_graph()
+graph = tf.compat.v1.get_default_graph()
+
+#モデル初期化
+model, encoder_model ,decoder_model = initialize_models('param_001' ,maxlen_e, maxlen_d,
+                                                      vec_dim, input_dim, output_dim, n_hidden)
 
 
 # ChatBotのメイン処理
 def bot_run(input_words):
-    global word_indices 
-    global indices_word
+    global word_indices
     global words
+    global indices_word
     global maxlen_e
     global maxlen_d
     global freq_indices
-    global vec_dim
     global n_hidden
-    global input_dim
     global output_dim
+    global encoder_model
+    global decoder_model
     global graph
 
+    # 入力文の品詞分解とインデックス化 
+    e_input = encode_request(input_words, maxlen_e, word_indices, words, encoder_model)
+
     with graph.as_default():
-
-      #モデル初期化
-      model, encoder_model ,decoder_model = initialize_models('param_001' ,maxlen_e, maxlen_d,
-                                                              vec_dim, input_dim, output_dim, n_hidden)
-
-      # 入力文の品詞分解とインデックス化 
-      e_input = encode_request(input_words, maxlen_e, word_indices, words, encoder_model)
-
       # 応答文組み立て
       decoded_sentence = generate_response(e_input, n_hidden, maxlen_d, output_dim, word_indices, 
                                               freq_indices, indices_word, encoder_model, decoder_model)
