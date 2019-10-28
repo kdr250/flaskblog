@@ -12,11 +12,19 @@ app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991a
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
-# ローカル環境がMySQLの場合
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'mysql://root:@localhost/flaskblog'
+# PostgreSQL
+db_name = os.environ['DBNAME']
+db_host = os.environ['DBHOST']
+db_user = os.environ['DBUSER']
+db_password = os.environ['DBPASS']
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}/{db_name}'
 db = SQLAlchemy(app)
 
-# ローカル環境がSQLiteの場合
+# ローカル環境がMySQL、デプロイ先がHerokuの場合
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'mysql://root:@localhost/flaskblog'
+# db = SQLAlchemy(app)
+
+# ローカル環境がSQLite、デプロイ先がHerokuの場合
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
 # db = SQLAlchemy(app)
 
