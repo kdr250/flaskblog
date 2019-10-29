@@ -42,7 +42,7 @@ ER図は下記の通りです。
 
 ## インストール
 ローカル環境へのインストールは、ターミナルにて下記コマンドを実行ください。
-また、あらかじめDBに当アプリ用のデータベース・接続用ユーザーをご用意ください、初期状態ではPostgreSQL用の設定になっています。
+またあらかじめ、PostgreSQLなどのDBに当アプリ用のデータベース・接続用ユーザーをご用意ください。初期状態ではPostgreSQL用の設定になっています。
 ```bash:
 $ git clone https://github.com/kdr250/flaskblog
 $ cd flaskblog
@@ -50,9 +50,9 @@ $ python -m venv venv
 $ source venv/bin/activate
 $ pip install -r requirements.txt
 $ export DBHOST="localhost"
-$ export DBNAME="作成したDB名"
-$ export DBUSER="DBユーザー名"
-$ export DBPASS="DBパスワード"
+$ export DBNAME="作成したデータベース名"
+$ export DBUSER="データベース接続用ユーザー名"
+$ export DBPASS="データベース接続用パスワード"
 $ export CHATBOTTER_SECRET_KEY="任意の文字列"
 $ source ~/.bash_profile
 ```
