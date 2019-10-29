@@ -7,7 +7,7 @@ import os
 
 # Config
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'd50afe8ef1fe6f6934245436e6a52776de99f8fa2b31e766991acaf6ef57'
+app.config['SECRET_KEY'] = os.environ['CHATBOTTER_SECRET_KEY']
 
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
