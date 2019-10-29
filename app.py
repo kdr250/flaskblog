@@ -8,7 +8,6 @@ import io
 import pickle
 import threading
 
-
 from config import app, db, login_manager, bcrypt
 from forms import ResigtrationForm, LoginForm, PostForm
 from models import User, Post
