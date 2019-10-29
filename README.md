@@ -36,6 +36,7 @@ ER図は下記の通りです。
 * PostgreSQL
 
 ### 使用ツール・ライブラリ
+* Flask
 * jQuery
 * Visual Studio Code
 * Bootstrap4
