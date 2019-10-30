@@ -42,7 +42,7 @@ ER図は下記の通りです。
 * Bootstrap4
 
 ## インストール
-ローカル環境へのインストールは、ターミナルにて下記コマンドを実行ください。
+ローカル環境へのインストールは、ターミナルにて下記コマンドを実行ください。Git LFSを未インストールの場合は[Git LFS](https://git-lfs.github.com/)をインストールしてください。
 またあらかじめ、PostgreSQLなどのDBに当アプリ用のデータベース・接続用ユーザーをご用意ください。初期状態ではPostgreSQL用の設定になっています。
 ```bash:
 $ git clone https://github.com/kdr250/flaskblog
